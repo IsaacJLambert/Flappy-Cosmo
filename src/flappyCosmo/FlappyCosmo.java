@@ -2,14 +2,11 @@ package flappyCosmo;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class FlappyCosmo implements ActionListener, MouseListener {
+public class FlappyCosmo implements ActionListener, MouseListener, KeyListener {
 
     public static FlappyCosmo flappyCosmo;
 
@@ -106,18 +103,39 @@ public class FlappyCosmo implements ActionListener, MouseListener {
             paintColumn(g, column);
         }
 
+        //score box
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(0, 0, 140, 35);
+        g.setColor(Color.black);
+        g.setFont(new Font("Arial", Font.BOLD, 25));
+        g.drawString("Score: " + score, 0, 27);
+        g.setColor(Color.white);
+        g.setFont(new Font("Arial", Font.BOLD, 25));
+        g.drawString("Score: " + score, 1, 25);
 
         if(!started) {
+            //Flappy cosmo
+            g.setColor(Color.black);
+            g.setFont(new Font("Arial", Font.BOLD, 100));
+            g.drawString("Flappy Cosmo", 55, HEIGHT / 2 - 45);
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 100));
             g.drawString("Flappy Cosmo", 60, HEIGHT / 2 - 50);
-
+            
+            //tap to start
+            g.setColor(Color.black);
+            g.setFont(new Font("Arial", Font.BOLD, 50));
+            g.drawString("Tap to start!", 247, HEIGHT / 2 + 54);
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 50));
             g.drawString("Tap to start!", 250, HEIGHT / 2 + 50);
         }
 
         if(gameOver) {
+            //gameover
+            g.setColor(Color.black);
+            g.setFont(new Font("Arial", Font.BOLD, 100));
+            g.drawString("Game Over!", 96, HEIGHT / 2 - 46);
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 100));
             g.drawString("Game Over!", 100, HEIGHT / 2 - 50);
@@ -151,7 +169,7 @@ public class FlappyCosmo implements ActionListener, MouseListener {
         if (!started) {
             started = true;
         }
-        else if (!gameOver) {
+        else {
             if (yMotion > 0) {
                 yMotion = 0;
             }
@@ -194,11 +212,15 @@ public class FlappyCosmo implements ActionListener, MouseListener {
             //gravity of cosmo
             cosmo.y += yMotion;
 
-            //check for collision
+            //check for collision & score
             for (Rectangle column : columns) {
                 if(column.intersects(cosmo)) {
                     gameOver = true;
                     cosmo.x = column.x - cosmo.width;
+                }
+
+                if (column.y == 0 && !gameOver && cosmo.x + cosmo.width / 2 > column.x + column.width / 2 - 10 && cosmo.x + cosmo.width / 2 < column.x + column.width / 2 + 10) {
+                    score++;
                 }
             }
 
@@ -210,9 +232,7 @@ public class FlappyCosmo implements ActionListener, MouseListener {
             //cosmo dies on the ground
             if(cosmo.y + yMotion >= HEIGHT - 120) {
                 cosmo.y = HEIGHT - 120 - cosmo.height;
-            }
-
-           
+            }           
         }
         renderer.repaint();    
     }
@@ -239,6 +259,21 @@ public class FlappyCosmo implements ActionListener, MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        jump();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
 
     }
 }
