@@ -27,11 +27,16 @@ public class FlappyCosmo implements ActionListener {
 
     public int yMotion;
 
+    public boolean gameOver;
+
+    public boolean started = true;
+
     public FlappyCosmo() {
         JFrame jframe = new JFrame();
         Timer timer = new Timer(20, this);
         renderer = new Renderer();
         random = new Random();
+        gameOver = false;
 
         jframe.add(renderer);
         jframe.setTitle("Flappy Cosmo");
@@ -75,25 +80,43 @@ public class FlappyCosmo implements ActionListener {
     }
 
     public void repaint(Graphics g) {
+
+        //bacakground
         g.setColor(Color.cyan);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
+        //floor/dirt
         g.setColor(Color.orange);
         g.fillRect(0,HEIGHT - 120, WIDTH, 120);
 
+        //floor/grass
         g.setColor(Color.green);
         g.fillRect(0,HEIGHT - 120, WIDTH, 20);
 
-
+        //player
         g.setColor(Color.red);
         g.fillRect(cosmo.x, cosmo.y, cosmo.width, cosmo.height);
 
         for(Rectangle column : columns) {
             paintColumn(g, column);
         }
+
+        g.setColor(Color.white);
+        g.setFont(new Font("Arial", 1, 100));
+
+        if(!started) {
+            g.drawString("Flappy Cosmo", 100, HEIGHT / 2 -50);
+        }
+
+        if(gameOver) {
+            g.drawString("Game Over!", 100, HEIGHT / 2 - 50);
+        }
+
     }
 
     public void paintColumn(Graphics g, Rectangle column) {
+
+        //paints the columns
         g.setColor(Color.green.darker());
         g.fillRect(column.x, column.y, column.width, column.height);
     }
@@ -104,33 +127,55 @@ public class FlappyCosmo implements ActionListener {
 
         int speed = 10;
 
-        //movement of the columns
-        for(int i = 0; i < columns.size(); i++) {
-            Rectangle column = columns.get(i);
-            column.x -= speed;
-        }
+        if(started) {
 
-        //time passing for the gravity
-        if(ticks % 2 == 0 && yMotion <= 15) {
-            yMotion += 2;
-        }
+            //movement of the columns
+            for(int i = 0; i < columns.size(); i++) {
+                Rectangle column = columns.get(i);
+                column.x -= speed;
+            }
 
-        //make columns disappear
-        for(int i = 0; i < columns.size(); i++) {
-            Rectangle column = columns.get(i);
-            
-            if(column.x + column.width < 0) {
-                columns.remove(column);
-              
-                if(column.y == 0) {
-                    addColumn(false);
+            //time passing for the gravity
+            if(ticks % 2 == 0 && yMotion <= 15) {
+                yMotion += 2;
+            }
+
+            //make columns disappear
+            for(int i = 0; i < columns.size(); i++) {
+                Rectangle column = columns.get(i);
+                
+                if(column.x + column.width < 0) {
+                    columns.remove(column);
+                
+                    if(column.y == 0) {
+                        addColumn(false);
+                    }
                 }
             }
+
+            //gravity of cosmo
+            cosmo.y += yMotion;
+
+            //check for collision
+            for (Rectangle column : columns) {
+                if(column.intersects(cosmo)) {
+                    gameOver = true;
+                    cosmo.x = column.x - cosmo.width;
+                }
+            }
+
+            //check for collision with ground / ceiling
+            if (cosmo.y >= HEIGHT - 120 || cosmo.y < 0) {
+                gameOver = true;
+            }
+
+            //cosmo is dead on the ground
+            if(gameOver) {
+                cosmo.y = HEIGHT - 120 - cosmo.height;
+            }
+
+           
         }
-
-        //gravity of cosmo
-        cosmo.y += yMotion;
-
-        renderer.repaint();
+        renderer.repaint();    
     }
 }
