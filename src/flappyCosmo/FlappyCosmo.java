@@ -29,7 +29,7 @@ public class FlappyCosmo implements ActionListener {
 
     public boolean gameOver;
 
-    public boolean started = true;
+    public boolean started;
 
     public FlappyCosmo() {
         JFrame jframe = new JFrame();
@@ -101,14 +101,20 @@ public class FlappyCosmo implements ActionListener {
             paintColumn(g, column);
         }
 
-        g.setColor(Color.white);
-        g.setFont(new Font("Arial", 1, 100));
 
         if(!started) {
-            g.drawString("Flappy Cosmo", 100, HEIGHT / 2 -50);
+            g.setColor(Color.white);
+            g.setFont(new Font("Arial", 1, 100));
+            g.drawString("Flappy Cosmo", 60, HEIGHT / 2 - 50);
+
+            g.setColor(Color.white);
+            g.setFont(new Font("Arial", 1, 50));
+            g.drawString("Tap to start!", 250, HEIGHT / 2 + 50);
         }
 
         if(gameOver) {
+            g.setColor(Color.white);
+            g.setFont(new Font("Arial", 1, 100));
             g.drawString("Game Over!", 100, HEIGHT / 2 - 50);
         }
 
