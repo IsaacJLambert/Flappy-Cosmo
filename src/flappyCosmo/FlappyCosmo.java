@@ -4,10 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class FlappyCosmo implements ActionListener {
+public class FlappyCosmo implements ActionListener, MouseListener {
 
     public static FlappyCosmo flappyCosmo;
 
@@ -31,6 +33,8 @@ public class FlappyCosmo implements ActionListener {
 
     public boolean started;
 
+    public int score;
+
     public FlappyCosmo() {
         JFrame jframe = new JFrame();
         Timer timer = new Timer(20, this);
@@ -41,6 +45,7 @@ public class FlappyCosmo implements ActionListener {
         jframe.add(renderer);
         jframe.setTitle("Flappy Cosmo");
         jframe.setSize(WIDTH, HEIGHT);
+        jframe.addMouseListener(this);
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jframe.setResizable(false);
         jframe.setVisible(true);
@@ -81,7 +86,7 @@ public class FlappyCosmo implements ActionListener {
 
     public void repaint(Graphics g) {
 
-        //bacakground
+        //background
         g.setColor(Color.cyan);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
@@ -104,17 +109,17 @@ public class FlappyCosmo implements ActionListener {
 
         if(!started) {
             g.setColor(Color.white);
-            g.setFont(new Font("Arial", 1, 100));
+            g.setFont(new Font("Arial", Font.BOLD, 100));
             g.drawString("Flappy Cosmo", 60, HEIGHT / 2 - 50);
 
             g.setColor(Color.white);
-            g.setFont(new Font("Arial", 1, 50));
+            g.setFont(new Font("Arial", Font.BOLD, 50));
             g.drawString("Tap to start!", 250, HEIGHT / 2 + 50);
         }
 
         if(gameOver) {
             g.setColor(Color.white);
-            g.setFont(new Font("Arial", 1, 100));
+            g.setFont(new Font("Arial", Font.BOLD, 100));
             g.drawString("Game Over!", 100, HEIGHT / 2 - 50);
         }
 
@@ -127,6 +132,34 @@ public class FlappyCosmo implements ActionListener {
         g.fillRect(column.x, column.y, column.width, column.height);
     }
 
+    public void jump() {
+        if (gameOver) {
+            //start new game
+            columns.clear();
+            cosmo = new Rectangle(WIDTH / 2 - 10, HEIGHT / 2 - 10, 20, 20);
+    
+            addColumn(true);
+            addColumn(true);
+            addColumn(true);
+            addColumn(true);
+
+            //reset score
+            score = 0;
+            yMotion = 0;
+            gameOver = false;
+        }
+        if (!started) {
+            started = true;
+        }
+        else if (!gameOver) {
+            if (yMotion > 0) {
+                yMotion = 0;
+            }
+    
+            yMotion -= 10;
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         ticks++;
@@ -136,8 +169,7 @@ public class FlappyCosmo implements ActionListener {
         if(started) {
 
             //movement of the columns
-            for(int i = 0; i < columns.size(); i++) {
-                Rectangle column = columns.get(i);
+            for (Rectangle column : columns) {
                 column.x -= speed;
             }
 
@@ -175,13 +207,38 @@ public class FlappyCosmo implements ActionListener {
                 gameOver = true;
             }
 
-            //cosmo is dead on the ground
-            if(gameOver) {
+            //cosmo dies on the ground
+            if(cosmo.y + yMotion >= HEIGHT - 120) {
                 cosmo.y = HEIGHT - 120 - cosmo.height;
             }
 
            
         }
         renderer.repaint();    
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        jump();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
